@@ -59,3 +59,57 @@ proton(action = "login", login=jhon_login, password=jhon_pswrd)
 #             proton.login.pass 
 # "Success! User is logged in!" 
 data(logs)
+logs$host<-as.character(logs$host)
+logs$login%>%str_subset("Pietraszko")
+employees$name%>%str_subset("Pietraszko")
+employees$surname %>%str_subset("Pietraszko")
+employees[employees$surname %in% "Pietraszko",]
+Slawomir_login<-employees[employees$surname %in% "Pietraszko","login"]
+logs$login%>%str_subset(Slawomir_login)
+logs[logs$login %in% Slawomir_login,"host"]%>%table()%>%sort(decreasing = T)%>%{.[1]}%>%names()->required_host
+proton(action = "server", host=required_host,hint=T)
+
+# It turns out that Pietraszko often uses the public workstation 194.29.178.16.
+# What a carelessness.
+# 
+# Bit infiltrated this workstation easily. He downloaded `bash_history` file which contains a list of all commands that were entered into the server's console.
+# The chances are that some time ago Pietraszko typed a password into the console by mistake thinking that he was logging into the Proton server.
+# 
+# Problem 4: Find the Pietraszko's password.
+# 
+# In the `bash_history` dataset you will find all commands and parameters which have ever been entered.
+# Try to extract from this dataset only commands (only strings before space) and check whether one of them looks like a password.
+
+# HINT:
+#   Commands and parameters are separated by a space. In order to extract only names of commands from each line, you can use `gsub` or `strsplit` function.
+# After having all commands extracted you should check how often each command is used.
+# Perhaps it will turn out that one of typed in commands look like a password?
+#   
+#   If you see something which looks like a password, you shall use `proton(action = "login", login="XYZ", password="ABC")` command to log into the Proton server with Pietraszko credentials.
+data("bash_history")
+bash_history[1:10]%>%str_split(" ")%>%map(length)%>%unlist()%>%unique
+bash_history%>%str_split(" ")%>%map(length)%>%unlist()%>%unique
+bash_history[1:20]%>%str_split_fixed(" ",3)
+bash_history%>%str_split_fixed(" ",3)->bash_splited
+
+bash_splited[,2]%>%str_subset("\\.")
+bash_splited[,2]%>%str_subset("/")
+
+bash_splited[,2]%>%str_detect("\\.|/")->bool_pat
+bash_splited[,2] %in% ""
+###good try
+bash_splited[!bool_pat & !bash_splited[,2] %in% "",]
+
+bash_splited[bash_splited[,2] %in% "" & bash_splited[,2] %in% "",1]%>%table
+
+proton(action = "login", login=Slawomir_login, password="DHbb7QXppuHnaXGN")
+
+# You have cracked Pietraszko's password!
+# Secret plans of his lab are now in your hands.
+# What is in this mysterious lab?
+# You may read about it in the `Pietraszko's cave` story which is available at http://biecek.pl/BetaBit/Warsaw
+# 
+# Next adventure of Beta and Bit will be available soon.
+# 
+# proton.login.pass 
+# "Success! User is logged in!" 
